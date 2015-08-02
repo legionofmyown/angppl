@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en" ng-app="myApp" class="no-js">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>My AngularJS Ppl list</title>
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="components/html5-boilerplate/css/normalize.css">
+    <link rel="stylesheet" href="components/html5-boilerplate/css/main.css">
+    <link rel="stylesheet" href="app.css">
+    <script src="components/html5-boilerplate/js/vendor/modernizr-2.6.2.min.js"></script>
+</head>
+<body>
+
+<div ng-controller="PplController" class="page">
+    <div class="left">
+        <button ng-click="add();">Add person</button><br/><br/>
+        <b>Search</b><br/>
+        <table border="0">
+            <tr><td>First name</td><td><input ng-model="query.fname" /></td></tr>
+            <tr><td>Last name</td><td><input ng-model="query.lname" /></td></tr>
+        </table>
+        <br/>
+        Order by <select ng-model="order">
+        <option value="fname">First name</option>
+        <option value="lname">Last name</option>
+        <option value="age">Age</option>
+        <option value="dob">DOB</option>
+        </select>
+        <hr/>
+        <ul>
+            <li ng-repeat="pers in dataProvider.getList() | filter:query | orderBy:order"><a href="" ng-click="view($index);">{{ pers.fname }} {{ pers.lname }}</a></li>
+        </ul>
+    </div>
+    <div class="right">
+        <div id="empty" ng-show="step == 'empty'">Please select a person from the list</div>
+
+
+        <div id="view" ng-show="step == 'view'">
+            <!--Selected #{{ id }}-->
+            <button ng-click="edit()">Edit</button>
+            <button ng-click="delPerson(id);">Delete</button>
+            <hr/>
+            <table border="0">
+                <tr><th>Name:</th><td>{{ dataProvider.getPerson(id).fname }} {{ dataProvider.getPerson(id).lname }}</td></tr>
+                <tr><th>DOB:</th><td>{{ dataProvider.getPerson(id).dob | dob }}</td></tr>
+
+                <tr><th>Phones:</th><td>
+                    <div ng-show="dataProvider.getPerson(id).phones.length">
+                        <ul>
+                            <li ng-repeat="phone in dataProvider.getPerson(id).phones">{{ phone.type }}: {{ phone.number}}</li>
+                        </ul>
+                    </div>
+                    <span ng-show="dataProvider.getPerson(id).phones.length == 0">none</span>
+                </td></tr>
+
+                <tr><th>Addresses:</th><td>
+                        <div ng-show="dataProvider.getPerson(id).addresses.length">
+                        <ul>
+                            <li ng-repeat="addr in dataProvider.getPerson(id).addresses">{{ addr.type}}: {{ addr.street }}, {{ addr.city }}, {{ addr.country }}</li>
+                        </ul>
+                    </div>
+                    <span ng-show="dataProvider.getPerson(id).addresses.length == 0">none</span>
+                </td></tr>
+                <tr><td colspan="2">
+                    {{ dataProvider.getPerson(id).descr }}
+                </td></tr>
+            </table>
+        </div>
+
+
+        <div id="edit" ng-show="step == 'edit'">
+            <!--Selected #{{ id }}-->
+            <button ng-click="view(id);">Cancel</button>
+            <button ng-click="save();">Save</button>
+            <hr/>
+            <div ng-show="errors.length" class="errors">
+                <ul>
+                    <li ng-repeat="err in errors">{{ err }}</li>
+                </ul>
+            </div>
+            <table border="0">
+                <tr><th>First name:</th><td><input type="text" ng-model="persData.fname" /></td></tr>
+                <tr><th>Last name:</th><td><input type="text" ng-model="persData.lname" /></td></tr>
+                <tr><th>DOB:</th><td><input type="date" ng-model="persData.dob" /></td></tr>
+                <tr><th>Phones:</th><td>
+                    <ul>
+                        <li ng-repeat="phone in persData.phones">
+                            <input type="tel" ng-model="persData.phones[$index].number" />
+                            <select ng-model="persData.phones[$index].type">
+                                <option>Personal</option>
+                                <option>Work</option>
+                                <option>Home</option>
+                            </select>
+                            <button ng-click="delPhone($index);">delete</button>
+                        </li>
+                        <li>
+                            <input type="tel" ng-model="newPhone.number" />
+                            <select ng-model="newPhone.type">
+                                <option>Personal</option>
+                                <option>Work</option>
+                                <option>Home</option>
+                            </select>
+                            <button ng-click="persData.phones.push(newPhone);newPhone = null;">add</button>
+                        </li>
+                    </ul>
+                </td></tr>
+                <tr><th>Addresses:</th><td>
+                    <ul>
+                        <li ng-repeat="addr in persData.addresses">
+                            <table border="0">
+                                <tr><td>Street</td><td><input type="text" ng-model="persData.addresses[$index].street" /></td></tr>
+                                <tr><td>City</td><td><input type="text" ng-model="persData.addresses[$index].city" /></td></tr>
+                                <tr><td>Country</td><td><input type="text" ng-model="persData.addresses[$index].country" /></td></tr>
+                                <tr><td>Type</td><td>
+                                    <select ng-model="persData.addresses[$index].type">
+                                        <option>Work</option>
+                                        <option>Home</option>
+                                    </select>
+                                </td></tr>
+                            </table>
+                            <button ng-click="delAddr($index);">delete</button>
+                        </li>
+                        <li>
+                            <table border="0">
+                                <tr><td>Street</td><td><input type="text" ng-model="newAddr.street" /></td></tr>
+                                <tr><td>City</td><td><input type="text" ng-model="newAddr.city" /></td></tr>
+                                <tr><td>Country</td><td><input type="text" ng-model="newAddr.country" /></td></tr>
+                                <tr><td>Type</td><td>
+                                    <select ng-model="newAddr.type">
+                                        <option>Work</option>
+                                        <option>Home</option>
+                                    </select>
+                                </td></tr>
+                            </table>
+                            <button ng-click="persData.addresses.push(newAddr);newAddr = null;">add</button>
+                        </li>
+                    </ul>
+                </td></tr>
+                <tr><th>Description:</th><td><textarea ng-model="persData.descr" style="width: 500px; height: 100px;"></textarea></td></tr>
+            </table>
+        </div>
+    </div>
+</div>
+
+<script src="components/angular/angular.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

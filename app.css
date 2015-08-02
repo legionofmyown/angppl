@@ -1,0 +1,35 @@
+.page {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding-bottom: 30px;
+}
+.page .left {
+  width: 300px;
+  height: 100%;
+  float: left;
+  background-color: #aaaaaa;
+  padding: 10px;
+  overflow: auto;
+}
+
+.page .right {
+  width: auto;
+  height: 100%;
+  background-color: #dddddd;
+  margin-left: 320px;
+  padding: 10px;
+  overflow: auto;
+}
+
+.page ul {
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+}
+
+.errors {
+  color: red;
+}
